@@ -48,7 +48,7 @@ class Character:
             target.take_damage(self.attack_power)
             print(f'{self.name} atacó a {target}.')
         else:
-            print(f'{self.name} está muerto.')
+            print(f'{self.name} no puede atacar porque está muerto.')
     
     def is_alive(self) -> bool:
         """
@@ -57,6 +57,13 @@ class Character:
         """
         return self.health > 0
     
-    
+    def __str__(self):
+        return (f'Nombre: {self.name}\n'
+                f'Nivel: {self.level}\n'
+                f'Salud: {self.health}/{self.max_health}\n'
+                f'Ataque: {self.attack_power}\n'
+                f'Defensa: {self.defense}\n'
+                f'Oro: {self.gold}\n'
+                f'XP: {self.xp}\n'
+                f'Velocidad: {self.speed}')  
 
-        
