@@ -18,7 +18,7 @@ class Character:
         self.defense = defense
         self.gold = gold
         self.xp = xp
-        self.speed = 5
+        self.speed = speed
         self.level = level
     
     def heal(self, amount: int):
@@ -44,9 +44,11 @@ class Character:
         print(f'{self.name} ganó {amount} puntos de xp.')
     
     def attack(self, target: 'Character'):
-
-        target.take_damage(self.attack_power)
-        print(f'{self.name} atacó a {target}.')
+        if self.is_alive():
+            target.take_damage(self.attack_power)
+            print(f'{self.name} atacó a {target}.')
+        else:
+            print(f'{self.name} está muerto.')
     
     def is_alive(self) -> bool:
         """
