@@ -27,12 +27,14 @@ class Character:
         else:
             self.health += amount
     
-    def take_damage(self, amount: int):
-        if self.health - amount < 0:
+    def take_damage(self, amount: int, attacker: 'Character' = None):
+        damage_taken = max(0, amount - 0.25 * self.defense)
+        if self.health - damage_taken < 0:
             self.health = 0
             print(f'{self.name} ha muerto.')
         else:
-            self.health -= amount
+            self.health -= damage_taken
+            print(f'{self.name} recibió {damage_taken} puntos de daño.')
             print(f'{self.name} tiene ahora {self.health} puntos de vida.')
     
     def level_up(self):
@@ -44,11 +46,11 @@ class Character:
         print(f'{self.name} ganó {amount} puntos de xp.')
     
     def attack(self, target: 'Character'):
-        if self.is_alive():
-            target.take_damage(self.attack_power)
-            print(f'{self.name} atacó a {target}.')
+        if self.is_alive() and target.is_alive():
+            print(f'{self.name} atacó a {target.name}.')
+            target.take_damage(self.attack_power, self)
         else:
-            print(f'{self.name} no puede atacar porque está muerto.')
+            print(f'{self.name} no puede atacar porque el atacante/atacado está muerto.')
     
     def is_alive(self) -> bool:
         """
@@ -67,3 +69,8 @@ class Character:
                 f'XP: {self.xp}\n'
                 f'Velocidad: {self.speed}')  
 
+"""
+char1=Character('pepe')
+char2=Character('Matias')
+char1.attack(char2)
+"""
