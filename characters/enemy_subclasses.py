@@ -39,3 +39,4 @@ paladin1 = TestChar('Arthur')
 print(paladin1)
 goblin1 = Goblin(level=5)
 print(goblin1)
+#
