@@ -70,8 +70,7 @@ class Character:
                 f'⭐ XP: {self.xp}\n'
                 f'⚡ Velocidad: {self.speed}') 
 
-"""
+
 char1=Character('pepe')
 char2=Character('Matias')
 char1.attack(char2)
-"""
