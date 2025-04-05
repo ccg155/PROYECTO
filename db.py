@@ -30,32 +30,63 @@ class Personajes(BaseDeDatos):
             CREATE TABLE IF NOT EXISTS Personajes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT UNIQUE,
-                raza TEXT,
                 clase TEXT,
-                nivel INTEGER,
-                xp INTEGER,
-                salud INTEGER ,
+                nivel INTEGER DEFAULT 1,
+                xp INTEGER DEFAULT 0,
+                salud INTEGER,
+                max_salud INTEGER,
                 fuerza INTEGER,
-                destreza INTEGER,
-                velocidad INTEGER,
-                dinero INTEGER DEFAULT
+                defensa INTEGER DEFAULT 0,
+                velocidad INTEGER DEFAULT 5,
+                oro INTEGER
             )
         ''') # El metodo execute se utiliza para realizar consultas en la db
         self.conn.commit() # Añade la tabla a la base de datos
 
-    def añadir_personaje(self, nombre, raza, clase, nivel, experiencia, salud, fuerza, destreza, inteligencia, dinero):
+    def añadir_personaje(self, nombre, clase, nivel, experiencia, salud, max_salud, fuerza, defensa, inteligencia, oro):
         self.cur.execute('''
             INSERT INTO Personajes 
-                (nombre, raza, clase, nivel, experiencia, salud, fuerza, destreza, inteligencia, dinero)
+                (nombre, clase, nivel, experiencia, salud, max_salud, fuerza, defensa, inteligencia, oro)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                (nombre, raza, clase, nivel, experiencia, salud, fuerza, destreza, inteligencia, dinero)
+                (nombre, clase, nivel, experiencia, salud, max_salud, fuerza, defensa, inteligencia, oro)
         )
         self.conn.commit() # Añade el nuevo personaje a la tabla 'Personajes' de la db
+
+    def actualizar_salud(self): # para cura/ataque
+        self.cur.execute('''
+            UPDATE Personajes 
+            SET salud = ? WHERE id = ?''',
+            (self.salud, self.id)
+        )
+        self.conn.commit()
+
+    def actualizar_nivel(self):
+        self.cur.execute('''
+            UPDATE Personajes 
+            SET nivel = ?, xp = 0 WHERE id = ?''',
+            (self.nivel, self.id)
+        )
+        self.conn.commit()
+
+    def actualizar_xp(self):
+        self.cur.execute('''
+            UPDATE Personajes 
+            SET xp = ? WHERE id = ?''',
+            (self.xp, self.id)
+        )
+        self.conn.commit()
+
+    def recompensa_ataque(self):
+        self.cur.execute('''
+            UPDATE Personajes 
+            SET xp = ? WHERE id = ?''',
+            (self.xp, self.id)
+        )
+        self.conn.commit()
 
     def mostrar_personajes(self):
         self.cur.execute('SELECT * FROM Personajes')
         return self.cur.fetchall() # muestra los resultados de la consulta anterior
-
 
 class Jugadores (Personajes):
     def __init__(self, db = 'juego.db'):
@@ -72,10 +103,11 @@ class Enemigos(Personajes):
                 nombre TEXT NOT NULL,
                 tipo TEXT NOT NULL,
                 nivel INTEGER DEFAULT 1,
-                vida INTEGER DEFAULT 30,
+                salud INTEGER DEFAULT 30,
                 fuerza INTEGER DEFAULT 5,
                 defensa INTEGER DEFAULT 3,
-                recompensa INTEGER DEFAULT 10
+                recompensa_xp INTEGER DEFAULT 10,
+                recompensa_oro INTEGER DEFAULT 1
             )
         ''')
 
@@ -102,7 +134,6 @@ class Objetos(BaseDeDatos):
             (nombre, tipo, descripcion, efecto, precio)
         )
         self.conn.commit()
-
 
 class Inventarios(BaseDeDatos):
     def __init__(self, db):
