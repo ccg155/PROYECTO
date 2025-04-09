@@ -20,9 +20,7 @@ class Level:
         self.create_map()
         
     def create_map(self):
-                   self.player = Player((x,y), [self.visible_sprites], self.obstacle_sprites)
-
-
+        
         layouts = {
             'boundary': import_csv_layout('./map/map_FloorBlocks.csv')
             
