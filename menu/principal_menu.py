@@ -316,6 +316,7 @@ def show_menu():
                         result = button.click()
                         if result == 'game':  # Si el usuario selecciona "Jugar"
                             background_music.stop()  # Detener la música del menú
+                            print('Dar paso al juego')
                             return 'game'  # Devolver 'game' para indicar que se debe iniciar el juego
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -402,3 +403,4 @@ def show_menu():
     pygame.quit()
     sys.exit()
 
+result= show_menu()
