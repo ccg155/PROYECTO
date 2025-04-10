@@ -7,7 +7,7 @@ pygame.init()
 # Configuración de la pantalla
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_surface().get_size()
-pygame.display.set_caption("RGB ADVENTURE")  # Título de la ventana
+pygame.display.set_caption("RPG ADVENTURE")  # Título de la ventana
 
 # Colores
 WHITE = (255, 255, 255)
@@ -24,15 +24,15 @@ button_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.05))
 # Inicializar el mezclador de sonido
 pygame.mixer.init()
 
-<<<<<<< HEAD
+
 # Fondo
-background_image = pygame.image.load("./menu/imagen_fondo2.jpg").convert()
+background_image = pygame.image.load("./menu/imagen_fondo_noche.png").convert()
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
-=======
+
 # Fondo (cargar ambas imágenes: día y noche)
-background_day = pygame.image.load("imagen_fondo_final.png").convert()
+background_day = pygame.image.load("./menu/imagen_fondo_final.png").convert()
 background_day = pygame.transform.scale(background_day, (SCREEN_WIDTH, SCREEN_HEIGHT))
-background_night = pygame.image.load("imagen_fondo_noche.png").convert()
+background_night = pygame.image.load("./menu/imagen_fondo_noche.png").convert()
 background_night = pygame.transform.scale(background_night, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Variable para controlar el fondo actual (True para día, False para noche)
@@ -47,7 +47,7 @@ fade_duration = 2000  # Duración de la transición en milisegundos (2 segundos)
 fade_start_time = None  # Tiempo en que comienza la transición
 fading = False  # Indica si estamos en medio de una transición
 fade_alpha = 0  # Valor de transparencia (0 = completamente transparente, 255 = completamente opaco)
->>>>>>> dc40ab2210cfe8e73aa23cda5ed2f2d66f7777b0
+
 
 # Música
 background_music = pygame.mixer.Sound("./menu/musica_fondo.wav")
@@ -56,8 +56,8 @@ background_music.play(-1)
 background_music.set_volume(0.2)
 
 # Título del juego con sombra
-title_text = title_font.render("RGB ADVENTURE", True, LIGHT_BLUE)  
-title_shadow = title_font.render("RGB ADVENTURE", True, BLACK)
+title_text = title_font.render("RPG ADVENTURE", True, LIGHT_BLUE)  
+title_shadow = title_font.render("RPG ADVENTURE", True, BLACK)
 title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
 title_shadow_rect = title_shadow.get_rect(center=(SCREEN_WIDTH // 2 + 5, int(SCREEN_HEIGHT * 0.15 + 5)))  # Sombra desplazada
 
