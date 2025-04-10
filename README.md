@@ -1,6 +1,6 @@
 # 🐉 Juego de Rol por Consola en Python
 
-Este proyecto es una aplicación de juego de rol basada en texto, desarrollada en Python, que permite a los jugadores sumergirse en aventuras épicas al estilo de *Dungeons & Dragons*. Los jugadores pueden crear personajes, explorar mundos, interactuar con otros personajes y enfrentar diversos desafíos, todo a través de una interfaz de línea de comandos.
+Este proyecto es una aplicación de juego de rol basada en texto, desarrollada en Python, que permite a los jugadores sumergirse en aventuras épicas al estilo de *Dungeons & Dragons*. Los jugadores pueden crear personajes, explorar mundos, interactuar con otros personajes y enfrentar diversos desafíos, todo a través de una interfaz de línea de comandos. (De momento en progreso, puede que falten algunos atributos)
 
 ---
 
@@ -10,12 +10,12 @@ Este proyecto es una aplicación de juego de rol basada en texto, desarrollada e
 ├── battle/                   # Módulo para la lógica de combate
 ├── characters/               # Definición de clases y atributos de personajes
 ├── database/                 # Gestión de datos y persistencia
-├── items/                    # Implementación de objetos y equipamiento
+├── items/                    # Implementación de objetos y equipamiento(Sprites, personajes, etc.)
 ├── ui/                       # Interfaz de usuario y menús interactivos
 ├── utils/                    # Funciones utilitarias y herramientas auxiliares
 ├── game.py                   # Lógica principal del juego
-├── main.py                   # Punto de entrada para la ejecución del juego
-├── requirements.txt          # Lista de dependencias del proyecto
+├── main.py                   # Menu de entrada para la ejecución del juego
+├── requirements.txt          # Lista de dependencias del proyecto(librerias)
 └── test_interactions.py      # Pruebas para las interacciones del juego
 ```
 
