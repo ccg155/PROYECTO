@@ -1,8 +1,8 @@
-import sys
 import pygame
+import sys
 
-# Inicializar Pygame
-pygame.init()
+
+pygame.init()  # Inicializar Pygame
 
 # Configuración de la pantalla
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -50,7 +50,7 @@ background_music.play(-1)
 background_music.set_volume(0.2)
 
 # Título del juego con sombra
-title_text = title_font.render("RGB ADVENTURE", True, LIGHT_BLUE)  
+title_text = title_font.render("RGB ADVENTURE", True, LIGHT_BLUE)
 title_shadow = title_font.render("RGB ADVENTURE", True, BLACK)
 title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
 title_shadow_rect = title_shadow.get_rect(center=(SCREEN_WIDTH // 2 + 5, int(SCREEN_HEIGHT * 0.15 + 5)))  # Sombra desplazada
@@ -115,7 +115,8 @@ class Slider:
 
 # Funciones de acción
 def start_game():
-    print("Iniciando el juego...")
+    global current_screen
+    current_screen= 'game'
 
 def show_controls():
     global current_screen
@@ -305,8 +306,11 @@ while running:
         back_text = button_font.render("Presiona ESC para volver", True, WHITE)
         screen.blit(back_text, (SCREEN_WIDTH // 2 - back_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
 
+    elif current_screen == 'game':
+        done=True
+        pygame.quit()
+        sys.exit()
+
+
     pygame.display.flip()
     clock.tick(60)
-
-pygame.quit()
-sys.exit()
