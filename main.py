@@ -18,7 +18,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            self.screen.fill('black')
             self.level.run()
             pygame.display.update()
             self.clock.tick(FPS)
