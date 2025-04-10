@@ -1,2 +1,5 @@
 pygame
 csv
+flask
+sys
+sqlite3
