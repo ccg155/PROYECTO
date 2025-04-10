@@ -24,12 +24,12 @@ button_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.05))
 pygame.mixer.init()
 
 # Fondo
-background_image = pygame.image.load("imagen_fondo2.jpg").convert()
+background_image = pygame.image.load("./menu/imagen_fondo2.jpg").convert()
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Música
-background_music = pygame.mixer.Sound("musica_fondo.wav")
-button_sound = pygame.mixer.Sound("musica_boton.wav")
+background_music = pygame.mixer.Sound("./menu/musica_fondo.wav")
+button_sound = pygame.mixer.Sound("./menu/musica_boton.wav")
 background_music.play(-1)
 background_music.set_volume(0.2)
 
@@ -133,10 +133,10 @@ title_text = title_font.render("Mi Juego", True, WHITE)
 title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
 
 # Cargar imágenes del personaje
-img_normal = pygame.image.load("imagen.png").convert_alpha()
-img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
-img_derecha = pygame.image.load("imagen1_der.png").convert_alpha()
-img_girado = pygame.image.load("imagen1_giro.png").convert_alpha()
+img_normal = pygame.image.load("./menu/imagen.png").convert_alpha()
+img_izquierda = pygame.image.load("./menu/imagen1_izq.png").convert_alpha()
+img_derecha = pygame.image.load("./menu/imagen1_der.png").convert_alpha()
+img_girado = pygame.image.load("./menu/imagen1_giro.png").convert_alpha()
 character_width, character_height = img_normal.get_size()
 
 # Posición y salto
