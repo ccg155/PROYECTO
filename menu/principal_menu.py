@@ -7,7 +7,7 @@ pygame.init()
 # Configuración de la pantalla
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_surface().get_size()
-pygame.display.set_caption("Menú del Juego")
+pygame.display.set_caption("RGB ADVENTURE")  # Título de la ventana
 
 # Colores
 WHITE = (255, 255, 255)
@@ -16,22 +16,44 @@ GRAY = (100, 100, 100)
 DARK_BLUE = (0, 50, 100)
 LIGHT_BLUE = (50, 150, 200)
 
-# Fuentes
-title_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.1))
+
+
+title_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.15))
 button_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.05))
 
 # Inicializar el mezclador de sonido
 pygame.mixer.init()
 
-# Fondo
-background_image = pygame.image.load("imagen_fondo2.jpg").convert()
-background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+# Fondo (cargar ambas imágenes: día y noche)
+background_day = pygame.image.load("imagen_fondo_final.png").convert()
+background_day = pygame.transform.scale(background_day, (SCREEN_WIDTH, SCREEN_HEIGHT))
+background_night = pygame.image.load("imagen_fondo_noche.png").convert()
+background_night = pygame.transform.scale(background_night, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+# Variable para controlar el fondo actual (True para día, False para noche)
+is_day = True
+
+# Temporizador para cambiar entre día y noche (en milisegundos)
+background_switch_time = 10000  # Cambiar cada 10 segundos
+last_switch_time = pygame.time.get_ticks()  # Tiempo del último cambio
+
+# Variables para la transición de desvanecimiento
+fade_duration = 2000  # Duración de la transición en milisegundos (2 segundos)
+fade_start_time = None  # Tiempo en que comienza la transición
+fading = False  # Indica si estamos en medio de una transición
+fade_alpha = 0  # Valor de transparencia (0 = completamente transparente, 255 = completamente opaco)
 
 # Música
 background_music = pygame.mixer.Sound("musica_fondo.wav")
 button_sound = pygame.mixer.Sound("musica_boton.wav")
 background_music.play(-1)
 background_music.set_volume(0.2)
+
+# Título del juego con sombra
+title_text = title_font.render("RGB ADVENTURE", True, LIGHT_BLUE)  
+title_shadow = title_font.render("RGB ADVENTURE", True, BLACK)
+title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
+title_shadow_rect = title_shadow.get_rect(center=(SCREEN_WIDTH // 2 + 5, int(SCREEN_HEIGHT * 0.15 + 5)))  # Sombra desplazada
 
 # Clase botón
 class Button:
@@ -128,10 +150,6 @@ slider = Slider(20, SCREEN_HEIGHT - 40, slider_width, 10)
 # Pantalla actual
 current_screen = "menu"
 
-# Título del juego
-title_text = title_font.render("Mi Juego", True, WHITE)
-title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
-
 # Cargar imágenes del personaje
 img_normal = pygame.image.load("imagen.png").convert_alpha()
 img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
@@ -156,7 +174,6 @@ def draw_shadow(x, y):
     shadow_height = 10
     shadow_x = x + (character_width - shadow_width) // 2
     shadow_y = ground_y + character_height - 10
-    opacity = max(30, 120 - abs(character_y - ground_y))
     shadow_surface = pygame.Surface((shadow_width, shadow_height), pygame.SRCALPHA)
     pygame.draw.ellipse(shadow_surface, (0, 0, 0), (0, 0, shadow_width, shadow_height))
     screen.blit(shadow_surface, (shadow_x, shadow_y))
@@ -167,7 +184,37 @@ running = True
 
 while running:
     screen.fill(BLACK)
-    screen.blit(background_image, (0, 0))
+
+    # Verificar si es momento de iniciar una transición
+    current_time = pygame.time.get_ticks()
+    if not fading and current_time - last_switch_time >= background_switch_time:
+        fading = True
+        fade_start_time = current_time
+
+    # Manejar la transición de desvanecimiento
+    if fading:
+        elapsed_time = current_time - fade_start_time
+        fade_progress = min(elapsed_time / fade_duration, 1.0)  # Progreso de la transición (0 a 1)
+        fade_alpha = int(fade_progress * 255)  # Convertir a valor de alfa (0 a 255)
+
+        if fade_progress >= 1.0:
+            fading = False  # Terminar la transición
+            last_switch_time = current_time
+            is_day = not is_day  # Cambiar entre día y noche al final de la transición
+
+    # Dibujar los fondos con desvanecimiento
+    if is_day:
+        # Día es el fondo principal, noche se desvanece
+        screen.blit(background_day, (0, 0))
+        if fading:
+            background_night.set_alpha(fade_alpha)  # Aumentar opacidad de la noche
+            screen.blit(background_night, (0, 0))
+    else:
+        # Noche es el fondo principal, día se desvanece
+        screen.blit(background_night, (0, 0))
+        if fading:
+            background_day.set_alpha(fade_alpha)  # Aumentar opacidad del día
+            screen.blit(background_day, (0, 0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -212,14 +259,14 @@ while running:
                 character_y = ground_y
                 character_phase = "normal"
         else:
-                if 'wait_counter' not in locals():
-                    wait_counter = 0
-                if wait_counter < 30:  # Espera medio segundo (30 frames)
-                    wait_counter += 1
-                    character_phase = "normal"
-                else:
-                    jumping = True
-                    wait_counter = 0
+            if 'wait_counter' not in locals():
+                wait_counter = 0
+            if wait_counter < 30:  # Espera medio segundo (30 frames)
+                wait_counter += 1
+                character_phase = "normal"
+            else:
+                jumping = True
+                wait_counter = 0
 
         # Imagen según la fase del salto
         if character_phase == "subiendo":
@@ -236,6 +283,9 @@ while running:
         screen.blit(character_img, (character_x, character_y))
 
         # Elementos del menú
+        # Dibujar la sombra del título primero
+        screen.blit(title_shadow, title_shadow_rect)
+        # Dibujar el título principal encima
         screen.blit(title_text, title_rect)
         for button in buttons:
             button.draw(screen)
