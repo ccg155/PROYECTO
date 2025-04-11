@@ -92,5 +92,3 @@ Contacta con el coordinador por [Carlos Crespo Gutiérrez](https://github.com/cc
 Para consultas o sugerencias, por favor, abre un issue en el repositorio o contacta a través de GitHub.
 
 ---
-
-¡Esperamos que disfrutes de la skibidiaventura y contribuyas al desarrollo del juego!
