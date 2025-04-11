@@ -34,7 +34,7 @@ Este proyecto es una aplicación de juego de rol basada en texto, desarrollada e
    Navega al directorio del proyecto y ejecuta:
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r requeriments.txt
    ```
 
 3. **Iniciar el juego**:
