@@ -57,8 +57,8 @@ Este proyecto es una aplicación de juego de rol basada en texto, desarrollada e
 
 Este proyecto utiliza las siguientes bibliotecas de Python:
 
-- [pygame](https://pypi.org/project/library_name/):  Biblioteca para el desarrollo de videojuegos en Python. Ofrece funciones para gráficos, sonido y manejo de eventos.
-- [pytest](https://pypi.org/project/otra_library/): Framework para escribir y ejecutar pruebas unitarias
+- [pygame](https://pypi.org/project/pyame/):  Biblioteca para el desarrollo de videojuegos en Python. Ofrece funciones para gráficos, sonido y manejo de eventos.
+- [pytest](https://pypi.org/project/pytest/): Framework para escribir y ejecutar pruebas unitarias
 *Nota*: Asegúrate de tener Python 3.x instalado en tu sistema.
 
 ---
