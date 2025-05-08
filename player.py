@@ -3,7 +3,7 @@ from support import *
 from settings import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_sprites):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack):
         super().__init__(groups)
         self.image = pygame.image.load('./graphics/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
@@ -11,9 +11,22 @@ class Player(pygame.sprite.Sprite):
         
         self.direction = pygame.math.Vector2() # Vector x: 0, y: 0
         self.speed = 5
+
+        # Contador de ataque
         self.attacking = False
         self.attack_cooldown = 400
         self.attack_time = 0
+
+        # Creador de armas
+        self.create_attack = create_attack
+        self.destroy_attack = destroy_attack
+        self.weapon_index = 0
+        self.weapon = list(weapon_data.keys())[self.weapon_index]
+
+        # Contador de cambio de arma
+        self.able_to_switch_weapon = True
+        self.weapon_switch_time = None
+        self.switch_duration = 200
 
         self.obstacle_sprites = obstacle_sprites
 
@@ -48,7 +61,7 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_SPACE]:
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
-                print('attack')
+                self.create_attack()
 
             # Input de magia
             if keys[pygame.K_LCTRL]:
@@ -56,11 +69,28 @@ class Player(pygame.sprite.Sprite):
                 self.attack_time = pygame.time.get_ticks()
                 print('magia')
 
+            # Cambiar de arma
+            if keys[pygame.K_c] and self.able_to_switch_weapon:
+                self.able_to_switch_weapon = False
+                self.weapon_switch_time = pygame.time.get_ticks()
+                if self.weapon_index < len(list(weapon_data.keys())) - 1:
+                    self.weapon_index += 1
+                else:
+                    self.weapon_index = 0
+                print(self.weapon_index)
+                self.weapon = list(weapon_data.keys())[self.weapon_index]
+
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
+        if self.attacking:
+            if current_time - self.attack_time >= self.attack_cooldown:
+                self.attacking = False
+                self.destroy_attack()
 
-        if current_time - self.attack_time >= self.attack_cooldown:
-            self.attacking = False
+        if not self.able_to_switch_weapon:
+            if current_time - self.weapon_switch_time >= self.switch_duration:
+                self.able_to_switch_weapon = True
+
 
     def move(self, speed):
         if self.direction.magnitude() != 0:
