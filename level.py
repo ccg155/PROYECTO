@@ -6,6 +6,7 @@ from debug import *
 from support import *
 import random
 from weapon import *
+from ui import *
 
 class Level:
     def __init__(self):
@@ -22,8 +23,10 @@ class Level:
         self.current_attack = None
 
         # Setup de los sprites.
-        
         self.create_map()
+
+        # Interfaz de usuario
+        self.ui = UI()
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.visible_sprites])
@@ -66,8 +69,7 @@ class Level:
     def run(self):
         self.visible_sprites.custom_draw(self.player) # Llamamos a la funcion draw en el grupo 'visible_sprites' y dibujamos al mismo sobre display_surface
         self.visible_sprites.update()
-        debug(self.player.status)
-        
+        self.ui.display(self.player)
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
