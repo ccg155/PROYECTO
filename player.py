@@ -145,19 +145,7 @@ class Player(Entity):
         else:
             if 'attack' in self.status:
                 self.status = self.status.replace('_attack', '')
-    def animate(self):
 
-        # El nombre de la animación, el cual escogemos de la lista animations
-        animation = self.animations[self.status]
-
-        # Recorrer el frame index
-        self.frame_index += self.animation_speed
-        if self.frame_index >= len(animation):
-            self.frame_index = 0
-
-        #
-        self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.hitbox.center)
     def update(self):
         self.input()
         self.move(self.speed)
