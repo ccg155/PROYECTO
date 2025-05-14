@@ -1,4 +1,5 @@
 import pygame
+from math import sin
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, groups):
@@ -32,3 +33,20 @@ class Entity(pygame.sprite.Sprite):
                         self.hitbox.bottom = sprite.hitbox.top  # Ponemos la parte baja del player(Self.rect.Bottom) pegada a la parte alta del obstacle (sprite.rect.top).
                     if self.direction.y < 0:  # Nos movemos hacia arriba.
                         self.hitbox.top = sprite.hitbox.bottom
+    def animate(self):
+        animation = self.animations[self.status]
+        self.frame_index += self.animation_speed
+        if self.frame_index >= len(animation):
+            self.frame_index = 0
+
+
+        self.image = animation[int(self.frame_index)]
+        self.rect = self.image.get_rect(center = self.hitbox.center)
+
+    @staticmethod
+    def alpha_variation():
+        value = sin(pygame.time.get_ticks())
+        if value >= 0:
+            return 255
+        else:
+            return 0

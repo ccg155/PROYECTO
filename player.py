@@ -45,7 +45,10 @@ class Player(Entity):
         self.exp = 123
         self.speed = self.stats['speed']
 
-
+        # Periodo de invencibilidad
+        self.vulnerable = True
+        self.hurt_time = 0
+        self.invincibility_duration = 500
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -108,7 +111,7 @@ class Player(Entity):
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         if self.attacking:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if current_time - self.attack_time >= self.attack_cooldown + weapon_data[self.weapon]['cooldown']:
                 self.attacking = False
                 self.destroy_attack()
 
@@ -119,6 +122,10 @@ class Player(Entity):
         if not self.able_to_switch_magic:
             if current_time - self.magic_switch_time >= self.switch_duration:
                 self.able_to_switch_magic = True
+
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invincibility_duration:
+                self.vulnerable = True
 
     def import_player_assets(self):
         character_path = './graphics/player/'
@@ -145,19 +152,22 @@ class Player(Entity):
         else:
             if 'attack' in self.status:
                 self.status = self.status.replace('_attack', '')
+
+    def get_full_weapon_dmg(self):
+        base_damage = self.stats['attack']
+        weapon_damage = weapon_data[self.weapon]['damage']
+        return base_damage + weapon_damage
+
     def animate(self):
+        super().animate()
 
-        # El nombre de la animación, el cual escogemos de la lista animations
-        animation = self.animations[self.status]
+        # Parpadeo
+        if not self.vulnerable:
+            alpha = self.alpha_variation()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
-        # Recorrer el frame index
-        self.frame_index += self.animation_speed
-        if self.frame_index >= len(animation):
-            self.frame_index = 0
-
-        #
-        self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.hitbox.center)
     def update(self):
         self.input()
         self.move(self.speed)
