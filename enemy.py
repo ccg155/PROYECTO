@@ -5,7 +5,7 @@ from support import *
 from debug import *
 
 class Enemy(Entity):
-    def __init__(self, enemy_name, pos, groups, obstacle_sprites, dmg_player):
+    def __init__(self, enemy_name, pos, groups, obstacle_sprites, dmg_player, death_particles):
 
         # Setup general
         super().__init__(groups)
@@ -38,6 +38,7 @@ class Enemy(Entity):
         self.attack_time = None
         self.attack_cooldown = 400
         self.dmg_player = dmg_player
+        self.death_particles = death_particles
 
         # Periodo de invencibilidad
         self.vulnerable = True
@@ -116,13 +117,14 @@ class Enemy(Entity):
             if attack_type == 'weapon':
                 self.health -= player.get_full_weapon_dmg()
             else:
-                pass
+                self.health -= player.get_full_magic_dmg()
                 # Daño por magia
             self.hit_time = pygame.time.get_ticks()
             self.vulnerable = False
 
     def is_dead(self):
         if self.health <= 0:
+            self.death_particles(self.rect.center, self.enemy_name)
             self.kill()
     def knockback(self):
         if not self.vulnerable:
