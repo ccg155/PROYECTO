@@ -168,9 +168,22 @@ class Player(Entity):
         else:
             self.image.set_alpha(255)
 
+    def energy_regen(self):
+        if self.energy < self.stats['energy']:
+            self.energy += 0.00125 * self.stats['magic']
+        if self.energy >= self.stats['energy']:
+            self.energy = self.stats['energy']
+
+    def get_full_magic_dmg(self):
+        base_dmg = self.stats['magic']
+        spell_dmg = magic_data[self.magic]['strength']
+        actual_dmg = base_dmg + spell_dmg
+        return actual_dmg
+
     def update(self):
         self.input()
         self.move(self.speed)
         self.cooldowns()
         self.get_status()
         self.animate()
+        self.energy_regen()

@@ -1,4 +1,6 @@
 import pygame
+
+from magic import MagicExec
 from settings import *
 from tile import *
 from player import *
@@ -8,6 +10,10 @@ import random
 from weapon import *
 from ui import *
 from enemy import Enemy
+from particles import *
+from random import randint
+from magic import *
+
 class Level:
     def __init__(self):
         
@@ -30,11 +36,18 @@ class Level:
         # Interfaz de usuario
         self.ui = UI()
 
+        # Partículas
+        self.animation_exec = AnimationExec()
+        self.magic_exec = MagicExec(self.animation_exec)
+
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
 
     def create_magic(self, style, strength, cost):
-        print(style, strength, cost)
+        if style == 'heal':
+            self.magic_exec.heal(self.player, strength, cost, [self.visible_sprites])
+        if style == 'flame':
+            self.magic_exec.flame(self.player, cost, [self.visible_sprites, self.attack_sprites])
 
     def destroy_attack(self):
         if self.current_attack:
@@ -83,7 +96,7 @@ class Level:
                                 elif col == '393': enemy_name = 'squid'
                                 Enemy(enemy_name,(x,y),
                                       [self.visible_sprites, self.attackable_sprites],
-                                      self.obstacle_sprites, self.dmg_player)
+                                      self.obstacle_sprites, self.dmg_player, self.enemy_death_particle)
 
     def attack_logic_player(self):
         if self.attack_sprites:
@@ -92,6 +105,10 @@ class Level:
                 if collision_sprites:
                     for target_sprite in collision_sprites:
                         if target_sprite.sprite_type == 'grass':
+                            pos = target_sprite.rect.center
+                            offset = pygame.math.Vector2(0,50)
+                            for leaf in range(randint(3,6)):
+                                self.animation_exec.create_grass_particles(pos - offset,[self.visible_sprites])
                             target_sprite.kill()
                         elif target_sprite.sprite_type == 'enemy':
                             target_sprite.get_damage(self.player,attack_sprite.sprite_type)
@@ -101,7 +118,12 @@ class Level:
             self.player.health -= amount
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
-            # partículas
+
+            # Partículas
+            self.animation_exec.create_particles(attack_type, self.player.rect.center, [self.visible_sprites])
+
+    def enemy_death_particle(self, pos, particle_type):
+        self.animation_exec.create_particles(particle_type, pos, self.visible_sprites)
 
     def run(self):
         self.visible_sprites.custom_draw(self.player) # Llamamos a la funcion draw en el grupo 'visible_sprites' y dibujamos al mismo sobre display_surface
