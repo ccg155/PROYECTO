@@ -13,10 +13,14 @@ from enemy import Enemy
 from particles import *
 from random import randint
 from magic import *
+from upgrade import Upgrade
 
 class Level:
     def __init__(self):
-        
+
+        # Pausa del juego
+        self.game_paused = False
+
         # Obtener la display surface. Que no es más que la totalidad de la pantalla
         
         self.display_surface = pygame.display.get_surface()
@@ -35,6 +39,7 @@ class Level:
 
         # Interfaz de usuario
         self.ui = UI()
+        self.upgrade = Upgrade(self.player)
 
         # Partículas
         self.animation_exec = AnimationExec()
@@ -96,7 +101,7 @@ class Level:
                                 elif col == '393': enemy_name = 'squid'
                                 Enemy(enemy_name,(x,y),
                                       [self.visible_sprites, self.attackable_sprites],
-                                      self.obstacle_sprites, self.dmg_player, self.enemy_death_particle)
+                                      self.obstacle_sprites, self.dmg_player, self.enemy_death_particle, self.gain_xp)
 
     def attack_logic_player(self):
         if self.attack_sprites:
@@ -125,12 +130,26 @@ class Level:
     def enemy_death_particle(self, pos, particle_type):
         self.animation_exec.create_particles(particle_type, pos, self.visible_sprites)
 
+
+    def gain_xp(self, amount):
+        self.player.exp += amount
+
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
+
     def run(self):
-        self.visible_sprites.custom_draw(self.player) # Llamamos a la funcion draw en el grupo 'visible_sprites' y dibujamos al mismo sobre display_surface
-        self.visible_sprites.update()
-        self.visible_sprites.enemy_update_level(self.player)
-        self.attack_logic_player()
+        self.visible_sprites.custom_draw(self.player)
         self.ui.display(self.player)
+
+        # Mostrar menú de mejoras
+        if self.game_paused:
+            self.upgrade.display()
+        # Ejecutar el juego
+        else:
+            self.visible_sprites.update()
+            self.visible_sprites.enemy_update_level(self.player)
+            self.attack_logic_player()
+
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()

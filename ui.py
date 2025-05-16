@@ -75,10 +75,7 @@ class UI:
     def display(self, player):
         self.show_bar(player.health, player.stats['health'],self.health_bar_rect, HEALTH_COLOR)
         self.show_bar(player.energy, player.stats['energy'],self.enery_bar_rect, ENERGY_COLOR)
-
-        self.show_exp(player.exp)
-
         self.weapon_overlay(player.weapon_index, not player.able_to_switch_weapon)
         self.magic_overlay(player.magic_index, not player.able_to_switch_magic)
-       # self.selection_box(80, 635) # Magia
+        self.show_exp(player.exp)
 

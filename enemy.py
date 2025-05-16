@@ -5,7 +5,7 @@ from support import *
 from debug import *
 
 class Enemy(Entity):
-    def __init__(self, enemy_name, pos, groups, obstacle_sprites, dmg_player, death_particles):
+    def __init__(self, enemy_name, pos, groups, obstacle_sprites, dmg_player, death_particles, gain_xp):
 
         # Setup general
         super().__init__(groups)
@@ -39,6 +39,7 @@ class Enemy(Entity):
         self.attack_cooldown = 400
         self.dmg_player = dmg_player
         self.death_particles = death_particles
+        self.gain_xp = gain_xp
 
         # Periodo de invencibilidad
         self.vulnerable = True
@@ -126,6 +127,7 @@ class Enemy(Entity):
         if self.health <= 0:
             self.death_particles(self.rect.center, self.enemy_name)
             self.kill()
+            self.gain_xp(self.exp)
     def knockback(self):
         if not self.vulnerable:
             self.direction *= -self.resistance

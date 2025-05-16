@@ -8,7 +8,7 @@ class Game:
         
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
-        pygame.display.set_caption('D&D 2D')
+        pygame.display.set_caption('FlowerPower Hardcore')
         self.clock = pygame.time.Clock()
         self.level = Level() # Se llama a la función level, por lo que se ejecuta su constructor y por tanto se dibujan los elementos de la matriz WORLD_MAP.
     
@@ -18,6 +18,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.level.toggle_menu()
             self.level.run()
             pygame.display.update()
             self.clock.tick(FPS)
