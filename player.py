@@ -9,7 +9,6 @@ class Player(Entity):
         self.image = pygame.image.load('graphics/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
         self.hitbox = self.rect.inflate(0,-26)
-        
 
         # Contador de ataque
         self.attacking = False
@@ -23,7 +22,7 @@ class Player(Entity):
         self.weapon = list(weapon_data.keys())[self.weapon_index]
         self.able_to_switch_weapon = True
         self.weapon_switch_time = None
-        self.switch_duration = 200
+        self.switch_duration = 400
 
         # Magia
         self.create_magic = create_magic
@@ -52,6 +51,10 @@ class Player(Entity):
         self.hurt_time = 0
         self.invincibility_duration = 500
 
+        # Importar sonido
+        self.weapon_attack_sound = pygame.mixer.Sound('audio/sword.wav')
+        self.weapon_attack_sound.set_volume(0.4)
+
     def input(self):
         keys = pygame.key.get_pressed()
 
@@ -78,6 +81,7 @@ class Player(Entity):
             if keys[pygame.K_SPACE]:
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
+                self.weapon_attack_sound.play()
                 self.create_attack()
 
             # Input de magia
@@ -109,6 +113,8 @@ class Player(Entity):
                 else:
                     self.magic_index = 0
                 self.magic = list(magic_data.keys())[self.magic_index]
+
+
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
@@ -172,7 +178,7 @@ class Player(Entity):
 
     def energy_regen(self):
         if self.energy < self.stats['energy']:
-            self.energy += 0.00125 * self.stats['magic']
+            self.energy += 0.005 * self.stats['magic']
         if self.energy >= self.stats['energy']:
             self.energy = self.stats['energy']
 
