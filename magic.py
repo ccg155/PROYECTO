@@ -5,9 +5,13 @@ from random import randint
 class MagicExec:
     def __init__(self, animation_exec):
         self.animation_exec = animation_exec
-
+        self.sounds = {
+            'heal': pygame.mixer.Sound('audio/heal.wav'),
+            'flame': pygame.mixer.Sound('audio/Fire.wav')
+        }
     def heal(self, player, strength, cost, groups):
         if player.energy >= cost:
+            self.sounds['heal'].play()
             player.health += strength
             player.energy -= cost
             if player.health >= player.stats['health']:
@@ -18,6 +22,7 @@ class MagicExec:
 
     def flame(self, player, cost, groups):
         if player.energy >= cost:
+            self.sounds['flame'].play()
             player.energy -= cost
 
             if player.status.split('_')[0] == 'right':
