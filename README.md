@@ -42,10 +42,10 @@ Este proyecto es una aplicación de juego de rol basada en texto, desarrollada e
 
 3. **Iniciar el juego**:
 
-   Ejecuta el siguiente comando:
+   Ejecuta el siguiente comando en el directiorio del juego:
 
    ```bash
-   python main.py
+   ./game_exec
    ```
 
    A partir de aquí, podrás:
