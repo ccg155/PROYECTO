@@ -1,5 +1,8 @@
 #  🐉 Juego de RPG en Python con pygame
 
+<u>Documento donde se explica paso a paso la creación del juego https://docs.google.com/document/d/1Ka6XKVpJCOGPW6uAZF2Bjjy6Fl9wW4rsaKjhJKsENBU/edit?usp=sharing</u>
+
+
 Este proyecto es una aplicación de juego de rol basada en texto, desarrollada en Python, que permite a los jugadores simular aventuras al estilo de *RPG*. Los jugadores pueden crear personajes, explorar mundos, interactuar con otros personajes y enfrentar diversos desafíos. (De momento en progreso, puede que falten algunos atributos)
 
 ---
