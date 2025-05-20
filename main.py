@@ -4,8 +4,25 @@ from level import *
 from player import *
 
 class Game:
+    """
+       Clase principal del juego que inicializa y ejecuta el bucle principal de la aplicación.
+
+       Métodos
+       -------
+       __init__():
+           Inicializa la pantalla, el reloj, el nivel del juego y reproduce la música de fondo.
+
+       run():
+           Ejecuta el bucle principal del juego, procesando eventos, actualizando el nivel y refrescando la pantalla.
+    """
     def __init__(self):
-        
+        """
+              Inicializa la instancia del juego:
+              - Configura la ventana principal de pygame.
+              - Establece el título del juego.
+              - Crea un objeto Level para manejar la lógica del nivel.
+              - Reproduce música de fondo en bucle.
+        """
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
         pygame.display.set_caption('FlowerPower Hardcore')
@@ -18,6 +35,12 @@ class Game:
         main_sound.set_volume(0.4)
 
     def run(self):
+        """
+               Ejecuta el bucle principal del juego:
+               - Captura y gestiona eventos del teclado y del sistema.
+               - Llama a la función de ejecución del nivel.
+               - Actualiza la pantalla a la velocidad de fotogramas definida.
+        """
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
