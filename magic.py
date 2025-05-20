@@ -3,13 +3,60 @@ from settings import *
 from random import randint
 
 class MagicExec:
+    """
+       Clase que gestiona la ejecución de hechizos mágicos en el juego.
+
+       Esta clase maneja la lógica para ejecutar hechizos mágicos como la curación (heal) y los ataques de fuego (flame).
+       Además, se encarga de reproducir los sonidos asociados a los hechizos y de crear las partículas correspondientes
+       utilizando la clase `AnimationExec`.
+
+       Atributos
+       ----------
+       animation_exec : AnimationExec
+           Instancia del objeto que maneja las animaciones y efectos de partículas.
+       sounds : dict
+           Diccionario que almacena los sonidos asociados a los hechizos mágicos.
+
+       Métodos
+       -------
+       heal(player, strength, cost, groups):
+           Ejecuta un hechizo de curación sobre el jugador.
+       flame(player, cost, groups):
+           Ejecuta un hechizo de fuego que genera una secuencia de partículas de fuego.
+       """
+
     def __init__(self, animation_exec):
+        """
+           Inicializa la clase `MagicExec`, configurando los sonidos de los hechizos y almacenando la instancia
+           de `AnimationExec`.
+
+           Parámetros
+           ----------
+           animation_exec : AnimationExec
+               Instancia del objeto encargado de gestionar las animaciones y partículas mágicas.
+
+           """
         self.animation_exec = animation_exec
         self.sounds = {
             'heal': pygame.mixer.Sound('audio/heal.wav'),
             'flame': pygame.mixer.Sound('audio/Fire.wav')
         }
     def heal(self, player, strength, cost, groups):
+        """
+           Ejecuta un hechizo de curación sobre el jugador, aumentando su salud y reduciendo su energía.
+
+           Parámetros
+           ----------
+           player : Player
+               El jugador que será curado por el hechizo.
+           strength : int
+               La cantidad de salud que se restaurará al jugador.
+           cost : int
+               El costo de energía para ejecutar el hechizo.
+           groups : list
+               Lista de grupos de sprites donde se generarán las partículas del hechizo.
+
+           """
         if player.energy >= cost:
             self.sounds['heal'].play()
             player.health += strength
@@ -21,6 +68,19 @@ class MagicExec:
 
 
     def flame(self, player, cost, groups):
+        """
+         Ejecuta un hechizo de fuego que crea una serie de partículas de fuego en la dirección que está mirando el jugador.
+
+         Parámetros
+         ----------
+         player : Player
+             El jugador que ejecuta el hechizo.
+         cost : int
+             El costo de energía para ejecutar el hechizo.
+         groups : list
+             Lista de grupos de sprites donde se generarán las partículas de fuego.
+
+         """
         if player.energy >= cost:
             self.sounds['flame'].play()
             player.energy -= cost

@@ -16,7 +16,66 @@ from magic import *
 from upgrade import Upgrade
 
 class Level:
+
+    """
+    Clase que gestiona toda la lógica del nivel, incluyendo el mapa, jugadores, enemigos, ataques,
+    partículas y la interfaz de usuario.
+
+    Atributos
+    ----------
+    game_paused : bool
+        Indica si el juego está en pausa.
+    display_surface : pygame.Surface
+        Superficie de visualización principal del juego.
+    visible_sprites : YSortCameraGroup
+        Grupo de sprites visibles ordenados por coordenada Y (efecto de profundidad).
+    obstacle_sprites : pygame.sprite.Group
+        Grupo de sprites que actúan como obstáculos (colisiones).
+    current_attack : Weapon or None
+        Ataque activo actual del jugador.
+    attackable_sprites : pygame.sprite.Group
+        Sprites que pueden ser afectados por ataques.
+    attack_sprites : pygame.sprite.Group
+        Sprites que representan los ataques activos.
+    ui : UI
+        Interfaz de usuario.
+    upgrade : Upgrade
+        Sistema de mejora del jugador.
+    animation_exec : AnimationExec
+        Administrador de efectos de animaciones/partículas.
+    magic_exec : MagicExec
+        Administrador de hechizos mágicos.
+
+    Métodos
+    -------
+    create_attack():
+        Crea un ataque físico del jugador.
+    create_magic(style, strength, cost):
+        Ejecuta un hechizo mágico del jugador.
+    destroy_attack():
+        Elimina el ataque actual.
+    create_map():
+        Crea el mapa del juego basado en archivos CSV.
+    attack_logic_player():
+        Lógica de colisiones entre ataques del jugador y objetos o enemigos.
+    dmg_player(amount, attack_type):
+        Aplica daño al jugador y crea efectos de partículas.
+    enemy_death_particle(pos, particle_type):
+        Crea partículas cuando un enemigo muere.
+    gain_xp(amount):
+        Añade experiencia al jugador.
+    toggle_menu():
+        Alterna entre pausa y juego activo.
+    run():
+        Ejecuta la lógica de actualización y renderizado del nivel.
+    """
+
     def __init__(self):
+        """
+           Inicializa el nivel del juego, configurando los grupos de sprites y la interfaz de usuario.
+           Además, crea el mapa, los enemigos y otras entidades necesarias.
+
+           """
 
         # Pausa del juego
         self.game_paused = False
@@ -46,20 +105,49 @@ class Level:
         self.magic_exec = MagicExec(self.animation_exec)
 
     def create_attack(self):
+        """
+            Crea un ataque físico para el jugador y lo agrega a los grupos correspondientes.
+
+            """
         self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
 
     def create_magic(self, style, strength, cost):
+        """
+           Crea y ejecuta un hechizo mágico basado en el estilo, fuerza y costo proporcionados.
+
+           Parámetros
+           ----------
+           style : str
+               El estilo de magia a ejecutar. Puede ser 'heal' para curación o 'flame' para ataque de fuego.
+           strength : int
+               La fuerza del hechizo (para curación o daño).
+           cost : int
+               El costo de maná o energía para ejecutar el hechizo.
+
+           """
+
         if style == 'heal':
             self.magic_exec.heal(self.player, strength, cost, [self.visible_sprites])
         if style == 'flame':
             self.magic_exec.flame(self.player, cost, [self.visible_sprites, self.attack_sprites])
 
     def destroy_attack(self):
+        """
+            Elimina el ataque actual del jugador si existe.
+
+            """
         if self.current_attack:
             self.current_attack.kill()
         self.current_attack = None
         
     def create_map(self):
+        """
+          Crea el mapa del juego cargando y procesando archivos CSV y gráficos.
+
+          Organiza las capas de terreno, obstáculos, objetos y entidades, y coloca los sprites correspondientes
+          en la pantalla.
+
+          """
         
         layouts = {
             'boundary': import_csv_layout('map/map_FloorBlocks.csv'),
@@ -104,6 +192,12 @@ class Level:
                                       self.obstacle_sprites, self.dmg_player, self.enemy_death_particle, self.gain_xp)
 
     def attack_logic_player(self):
+        """
+           Lógica de colisiones entre los ataques del jugador y los objetos o enemigos.
+
+           Si un ataque del jugador colisiona con un objeto o enemigo, se aplica el daño o se generan efectos.
+
+           """
         if self.attack_sprites:
             for attack_sprite in self.attack_sprites:
                 collision_sprites = pygame.sprite.spritecollide(attack_sprite,self.attackable_sprites,False)
@@ -119,6 +213,17 @@ class Level:
                             target_sprite.get_damage(self.player,attack_sprite.sprite_type)
 
     def dmg_player(self, amount, attack_type):
+        """
+           Aplica daño al jugador y genera partículas visuales asociadas al tipo de ataque.
+
+           Parámetros
+           ----------
+           amount : int
+               La cantidad de daño que se aplicará al jugador.
+           attack_type : str
+               El tipo de ataque (por ejemplo, 'flame', 'sword', etc.).
+
+           """
         if self.player.vulnerable:
             self.player.health -= amount
             self.player.vulnerable = False
@@ -128,16 +233,49 @@ class Level:
             self.animation_exec.create_particles(attack_type, self.player.rect.center, [self.visible_sprites])
 
     def enemy_death_particle(self, pos, particle_type):
+        """
+          Crea partículas cuando un enemigo muere, usando el tipo de partícula proporcionado.
+
+          Parámetros
+          ----------
+          pos : tuple
+              La posición en la que se generarán las partículas.
+          particle_type : str
+              El tipo de partícula a generar (por ejemplo, 'flame', 'blood', etc.).
+
+          """
         self.animation_exec.create_particles(particle_type, pos, self.visible_sprites)
 
 
     def gain_xp(self, amount):
+        """
+          Añade la cantidad de experiencia especificada al jugador.
+
+          Parámetros
+          ----------
+          amount : int
+              La cantidad de experiencia a añadir.
+
+          """
         self.player.exp += amount
 
     def toggle_menu(self):
+        """
+          Alterna entre la pausa del juego y el estado activo.
+
+          Cambia el valor de la variable `game_paused` para pausar o reanudar el juego.
+
+          """
         self.game_paused = not self.game_paused
 
     def run(self):
+        """
+           Ejecuta la lógica de actualización y renderizado del nivel.
+
+           Actualiza todos los sprites visibles y enemigos, maneja las colisiones y ataques,
+           y dibuja la interfaz de usuario.
+
+           """
         self.visible_sprites.custom_draw(self.player)
         self.ui.display(self.player)
 
@@ -151,7 +289,34 @@ class Level:
             self.attack_logic_player()
 
 class YSortCameraGroup(pygame.sprite.Group):
+    """
+     Grupo de sprites con cámara que ordena los sprites según su coordenada Y,
+     proporcionando una simulación de profundidad (z-index).
+
+     Atributos
+     ----------
+     display_surface : pygame.Surface
+         Superficie de visualización principal.
+     half_width : int
+         Mitad del ancho de la pantalla.
+     half_heigth : int
+         Mitad de la altura de la pantalla.
+     floor_surf : pygame.Surface
+         Imagen del suelo del nivel.
+     floor_rect : pygame.Rect
+         Rectángulo que delimita el suelo.
+     offset : pygame.math.Vector2
+         Desplazamiento de cámara en x e y, centrado en el jugador.
+
+     Métodos
+     -------
+     custom_draw(player):
+         Dibuja todos los sprites ordenados por Y con desplazamiento centrado en el jugador.
+     enemy_update_level(player):
+         Llama a la actualización específica de enemigos visibles en el nivel.
+     """
     def __init__(self):
+
         super().__init__()
         self.display_surface = pygame.display.get_surface()
         self.half_width = self.display_surface.get_size()[0] // 2
@@ -164,6 +329,15 @@ class YSortCameraGroup(pygame.sprite.Group):
 
         self.offset = pygame.math.Vector2()
     def custom_draw(self, player):
+        """
+          Dibuja todos los sprites ordenados por su coordenada Y, aplicando un desplazamiento para centrar la cámara en el jugador.
+
+          Parámetros
+          ----------
+          player : Player
+              El jugador cuya posición se utiliza para centrar la cámara.
+
+          """
         
         # Conseguimos el desplazamiento (offset)
         self.offset.x = player.rect.centerx - self.half_width
@@ -178,6 +352,15 @@ class YSortCameraGroup(pygame.sprite.Group):
             self.display_surface.blit(sprite.image, offset_pos)
 
     def enemy_update_level(self, player):
+        """
+          Actualiza a los enemigos visibles en el nivel, llamando su método de actualización.
+
+          Parámetros
+          ----------
+          player : Player
+              El jugador que es usado para actualizar a los enemigos visibles.
+
+          """
         enemy_sprites = []
         for sprite in self.sprites():
             if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy':
