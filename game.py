@@ -32,3 +32,18 @@ def actualizar_personaje(pid, salud, xp, nivel, dinero):
     except Exception as e:
         print("Error al actualizar personaje:", e)
         return False
+
+from api_client import obtener_personajes, obtener_personaje_por_id, actualizar_personaje
+personajes = obtener_personajes()
+print("PERSONAJES DISPONIBLES:")
+for p in personajes:
+    print(f"{p['id']}: {p['nombre']} (Nivel {p['nivel']}, Salud {p['salud']})")
+
+# Selección por terminal por ahora (podés hacer un selector bonito en Pygame más adelante)
+try:
+    personaje_id = int(input("Selecciona un personaje por ID: "))
+    personaje_actual = obtener_personaje_por_id(personaje_id)
+    print("Seleccionaste a:", personaje_actual["nombre"])
+except Exception as e:
+    print("Error seleccionando personaje:", e)
+    return
