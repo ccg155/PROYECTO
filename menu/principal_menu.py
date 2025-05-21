@@ -19,9 +19,9 @@ class Menu:
         pygame.init()
         pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1280,720))
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = self.screen.get_size()
-        pygame.display.set_caption("RGB ADVENTURE")
+        pygame.display.set_caption("FlowerPower Hardcore")
 
         self.WHITE = (255, 255, 255)
         self.BLACK = (0, 0, 0)
@@ -53,8 +53,8 @@ class Menu:
         self.background_music.set_volume(0.2)
 
         # Título
-        self.title_text = self.title_font.render("RGB ADVENTURE", True, self.LIGHT_BLUE)
-        self.title_shadow = self.title_font.render("RGB ADVENTURE", True, self.BLACK)
+        self.title_text = self.title_font.render("FlowerPower Hardcore", True, self.LIGHT_BLUE)
+        self.title_shadow = self.title_font.render("FlowerPower Hardcore", True, self.BLACK)
         self.title_rect = self.title_text.get_rect(center=(self.SCREEN_WIDTH // 2, int(self.SCREEN_HEIGHT * 0.15)))
         self.title_shadow_rect = self.title_shadow.get_rect(
             center=(self.SCREEN_WIDTH // 2 + 5, int(self.SCREEN_HEIGHT * 0.15 + 5)))
@@ -379,10 +379,11 @@ class Menu:
                     "S: Mover abajo",
                     "A: Mover izquierda",
                     "D: Mover derecha",
-                    "ESPACIO: Saltar",
-                    "R: Cambio de habilidad",
+                    "ESPACIO: Atacar",
+                    "R: Cambio de hechizo",
                     "C: Cambio de arma",
-                    "ESC: Menu de estadísticas"
+                    "ESC: Menu de estadísticas",
+                    "CNTRL IZQ: Realizar hechizo"
                 ]
                 # Calcular la posición inicial para centrar los controles verticalmente
                 total_height = len(controls_texts) * 40  # 40 píxeles de separación entre líneas
