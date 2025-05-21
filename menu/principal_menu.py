@@ -40,9 +40,9 @@ def show_menu():
     pygame.mixer.init()
 
     # Fondo (cargar ambas imágenes: día y noche)
-    background_day = pygame.image.load("./menu/imagen_fondo_final.png").convert()
+    background_day = pygame.image.load("imagen_fondo_final.png").convert()
     background_day = pygame.transform.scale(background_day, (SCREEN_WIDTH, SCREEN_HEIGHT))
-    background_night = pygame.image.load("./menu/imagen_fondo_noche.png").convert()
+    background_night = pygame.image.load("imagen_fondo_noche.png").convert()
     background_night = pygame.transform.scale(background_night, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # Variable para controlar el fondo actual (True para día, False para noche)
@@ -59,8 +59,8 @@ def show_menu():
     fade_alpha = 0
 
     # Música
-    background_music = pygame.mixer.Sound("./menu/musica_fondo.wav")
-    button_sound = pygame.mixer.Sound("./menu/musica_boton.wav")
+    background_music = pygame.mixer.Sound("musica_fondo.wav")
+    button_sound = pygame.mixer.Sound("musica_boton.wav")
     background_music.play(-1)
     background_music.set_volume(0.2)
 
@@ -234,10 +234,10 @@ def show_menu():
     current_screen = "menu"
 
     # Cargar imágenes del personaje
-    img_normal = pygame.image.load("./menu/imagen.png").convert_alpha()
-    img_izquierda = pygame.image.load("./menu/imagen1_izq.png").convert_alpha()
-    img_derecha = pygame.image.load("./menu/imagen1_der.png").convert_alpha()
-    img_girado = pygame.image.load("./menu/imagen1_giro.png").convert_alpha()
+    img_normal = pygame.image.load("imagen.png").convert_alpha()
+    img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
+    img_derecha = pygame.image.load("imagen1_der.png").convert_alpha()
+    img_girado = pygame.image.load("imagen1_giro.png").convert_alpha()
     character_width, character_height = img_normal.get_size()
 
     # Posición y salto
