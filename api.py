@@ -234,3 +234,46 @@ def add_mazmorra():
 #Si se ejecuta el archivo directamente
 if __name__ == '__main__':
     app.run(debug=True) #Enciende el servidor y si algo no funciona, muestra el error en pantalla
+
+# GET personaje por ID
+@app.route('/api/personajes/<int:personaje_id>', methods=['GET'])
+def get_personaje_by_id(personaje_id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM Personajes WHERE id = ?', (personaje_id,))
+    row = cur.fetchone()
+    conn.close()
+    if row:
+        return jsonify(dict(row))
+    return jsonify({'error': 'Personaje no encontrado'}), 404
+
+# PUT actualizar personaje
+@app.route('/api/personajes/<int:personaje_id>', methods=['PUT'])
+def update_personaje(personaje_id):
+    data = request.get_json()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute('''
+        UPDATE Personajes
+        SET salud = ?, xp = ?, nivel = ?, dinero = ?
+        WHERE id = ?
+    ''', (
+        data['salud'],
+        data['xp'],
+        data['nivel'],
+        data['dinero'],
+        personaje_id
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({'mensaje': 'Personaje actualizado'}), 200
+
+# DELETE personaje
+@app.route('/api/personajes/<int:personaje_id>', methods=['DELETE'])
+def delete_personaje(personaje_id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM Personajes WHERE id = ?', (personaje_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'mensaje': 'Personaje eliminado'}), 200
