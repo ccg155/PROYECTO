@@ -29,10 +29,7 @@ class Game:
         self.level = Level()  # Se llama a la función level, por lo que se ejecuta su constructor
         self.menu = Menu()   # Inicializamos el menú
 
-        # Sonido
-        main_sound = pygame.mixer.Sound('audio/main.ogg')
-        main_sound.play(loops=-1)
-        main_sound.set_volume(0.4)
+
 
     def run(self):
         """
@@ -45,6 +42,10 @@ class Game:
         """
         result = self.menu.run()  # Mostramos el menú y obtenemos el resultado
         if result == 'game':
+            # Sonido
+            main_sound = pygame.mixer.Sound('audio/main.ogg')
+            main_sound.play(loops=-1)
+            main_sound.set_volume(0.4)
             while True:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
