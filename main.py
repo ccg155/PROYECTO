@@ -1,8 +1,6 @@
-import pygame, sys
-from settings import *
 from level import *
 from player import *
-from principal_menu import *
+from menu.principal_menu import *
 
 class Game:
     """
