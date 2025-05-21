@@ -1,406 +1,277 @@
 import pygame
 import sys
 
+class Menu:
+    def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
 
-def show_menu():
-    """
-    Muestra el menú principal del juego "RGB ADVENTURE" y gestiona las interacciones del usuario.
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.SCREEN_WIDTH, self.SCREEN_HEIGHT = self.screen.get_size()
+        pygame.display.set_caption("RGB ADVENTURE")
 
-    Este menú incluye botones para "Jugar", "Controles", "Créditos" y "Salir", un slider para ajustar
-    el volumen, una animación de un personaje que salta y se mueve, y un fondo que alterna entre día y noche
-    con una transición de desvanecimiento. La función devuelve un valor cuando el usuario selecciona "Jugar".
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
+        self.GRAY = (100, 100, 100)
+        self.DARK_BLUE = (0, 50, 100)
+        self.LIGHT_BLUE = (50, 150, 200)
 
-    Returns:
-        str: Devuelve 'game' si el usuario selecciona "Jugar", indicando que el juego debe iniciarse.
-        No devuelve nada si el usuario sale del juego (cierra la ventana o selecciona "Salir").
+        self.title_font = pygame.font.Font(None, int(self.SCREEN_HEIGHT * 0.15))
+        self.button_font = pygame.font.Font(None, int(self.SCREEN_HEIGHT * 0.05))
 
-    Raises:
-        FileNotFoundError: Si no se encuentran los archivos de imágenes o sonidos (como 'imagen_fondo_final.png').
-        pygame.error: Si hay un error al inicializar Pygame o al cargar recursos.
-    """
-    # Inicializar Pygame
-    pygame.init()
+        # Cargar fondos día/noche
+        self.background_day = pygame.transform.scale(pygame.image.load("imagen_fondo_final.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.background_night = pygame.transform.scale(pygame.image.load("imagen_fondo_noche.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
-    # Configuración de la pantalla
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    SCREEN_WIDTH, SCREEN_HEIGHT = pygame.display.get_surface().get_size()
-    pygame.display.set_caption("RGB ADVENTURE")
+        self.is_day = True
+        self.background_switch_time = 10000
+        self.last_switch_time = pygame.time.get_ticks()
+        self.fade_duration = 2000
+        self.fade_start_time = None
+        self.fading = False
+        self.fade_alpha = 0
 
-    # Colores
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    GRAY = (100, 100, 100)
-    DARK_BLUE = (0, 50, 100)
-    LIGHT_BLUE = (50, 150, 200)
+        # Música
+        self.background_music = pygame.mixer.Sound("musica_fondo.wav")
+        self.button_sound = pygame.mixer.Sound("musica_boton.wav")
+        self.background_music.play(-1)
+        self.background_music.set_volume(0.2)
 
-    title_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.15))
-    button_font = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.05))
+        # Título
+        self.title_text = self.title_font.render("RGB ADVENTURE", True, self.LIGHT_BLUE)
+        self.title_shadow = self.title_font.render("RGB ADVENTURE", True, self.BLACK)
+        self.title_rect = self.title_text.get_rect(center=(self.SCREEN_WIDTH // 2, int(self.SCREEN_HEIGHT * 0.15)))
+        self.title_shadow_rect = self.title_shadow.get_rect(center=(self.SCREEN_WIDTH // 2 + 5, int(self.SCREEN_HEIGHT * 0.15 + 5)))
 
-    # Inicializar el mezclador de sonido
-    pygame.mixer.init()
+        self.button_width = int(self.SCREEN_WIDTH * 0.25)
+        self.button_height = int(self.SCREEN_HEIGHT * 0.08)
+        self.button_spacing = int(self.SCREEN_HEIGHT * 0.03)
+        self.button_x = (self.SCREEN_WIDTH - self.button_width) // 2
+        self.button_y_start = self.SCREEN_HEIGHT // 3
 
-    # Fondo (cargar ambas imágenes: día y noche)
-    background_day = pygame.image.load("imagen_fondo_final.png").convert()
-    background_day = pygame.transform.scale(background_day, (SCREEN_WIDTH, SCREEN_HEIGHT))
-    background_night = pygame.image.load("imagen_fondo_noche.png").convert()
-    background_night = pygame.transform.scale(background_night, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.current_screen = "menu"
 
-    # Variable para controlar el fondo actual (True para día, False para noche)
-    is_day = True
+        # Personaje animado
+        self.img_normal = pygame.image.load("imagen.png").convert_alpha()
+        self.img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
+        self.img_derecha = pygame.image.load("imagen1_der.png").convert_alpha()
+        self.img_girado = pygame.image.load("imagen1_giro.png").convert_alpha()
+        self.character_width, self.character_height = self.img_normal.get_size()
+        self.character_x = -self.character_width
+        self.ground_y = int(self.SCREEN_HEIGHT * 0.75)
+        self.character_y = self.ground_y
+        self.character_speed = 2
+        self.jumping = True
+        self.jump_counter = 0
+        self.jump_height = 120
+        self.jump_max = 150
+        self.character_phase = "normal"
+        self.wait_counter = 0
 
-    # Temporizador para cambiar entre día y noche (en milisegundos)
-    background_switch_time = 10000  # Cambiar cada 10 segundos
-    last_switch_time = pygame.time.get_ticks()
+        self.Slider = self._create_slider_class()
+        self.Button = self._create_button_class()
 
-    # Variables para la transición de desvanecimiento
-    fade_duration = 2000
-    fade_start_time = None
-    fading = False
-    fade_alpha = 0
+        self.slider = self.Slider(20, self.SCREEN_HEIGHT - 40, int(self.SCREEN_WIDTH * 0.2), 10)
+        self.buttons = [
+            self.Button("Jugar", self.button_x, self.button_y_start, self.button_width, self.button_height, self.LIGHT_BLUE, self.start_game),
+            self.Button("Controles", self.button_x, self.button_y_start + self.button_height + self.button_spacing, self.button_width, self.button_height, self.LIGHT_BLUE, self.show_controls),
+            self.Button("Créditos", self.button_x, self.button_y_start + 2 * (self.button_height + self.button_spacing), self.button_width, self.button_height, self.LIGHT_BLUE, self.show_credits),
+            self.Button("Salir", self.button_x, self.button_y_start + 3 * (self.button_height + self.button_spacing), self.button_width, self.button_height, self.LIGHT_BLUE, self.quit_game)
+        ]
 
-    # Música
-    background_music = pygame.mixer.Sound("musica_fondo.wav")
-    button_sound = pygame.mixer.Sound("musica_boton.wav")
-    background_music.play(-1)
-    background_music.set_volume(0.2)
+    def _create_button_class(self):
+        menu = self
+        class Button:
+            def __init__(self, text, x, y, width, height, color, action=None):
+                self.text = text
+                self.base_rect = pygame.Rect(x, y, width, height)
+                self.rect = self.base_rect.copy()
+                self.color = color
+                self.action = action
+                self.hovered = False
 
-    # Título del juego con sombra
-    title_text = title_font.render("RGB ADVENTURE", True, LIGHT_BLUE)
-    title_shadow = title_font.render("RGB ADVENTURE", True, BLACK)
-    title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, int(SCREEN_HEIGHT * 0.15)))
-    title_shadow_rect = title_shadow.get_rect(center=(SCREEN_WIDTH // 2 + 5, int(SCREEN_HEIGHT * 0.15 + 5)))
+            def draw(self, screen):
+                scale = 1.2 if self.hovered else 1.0
+                new_rect = self.base_rect.inflate(scale * self.base_rect.width - self.base_rect.width,
+                                                  scale * self.base_rect.height - self.base_rect.height)
+                self.rect = new_rect
+                pygame.draw.rect(screen, self.color, self.rect, border_radius=15)
+                text_surf = menu.button_font.render(self.text, True, menu.WHITE)
+                scaled_text = pygame.transform.scale(text_surf, (int(text_surf.get_width() * scale), int(text_surf.get_height() * scale)))
+                text_rect = scaled_text.get_rect(center=self.rect.center)
+                screen.blit(scaled_text, text_rect)
 
-    # Clase botón
-    class Button:
-        """
-        Clase que representa un botón interactivo en el menú.
+            def check_hover(self, pos):
+                self.hovered = self.rect.collidepoint(pos)
 
-        Args:
-            text (str): Texto que se mostrará en el botón.
-            x (int): Posición en el eje X del botón.
-            y (int): Posición en el eje Y del botón.
-            width (int): Ancho del botón.
-            height (int): Alto del botón.
-            color (tuple): Color del botón en formato RGB.
-            action (callable, optional): Función a ejecutar cuando se hace clic en el botón.
-        """
-        def __init__(self, text, x, y, width, height, color, action=None):
-            self.text = text
-            self.base_rect = pygame.Rect(x, y, width, height)
-            self.rect = self.base_rect.copy()
-            self.color = color
-            self.action = action
-            self.hovered = False
+            def click(self):
+                menu.button_sound.play()
+                if self.action:
+                    return self.action()
+                return None
+        return Button
 
-        def draw(self, screen):
-            """
-            Dibuja el botón en la pantalla con un efecto de escala al pasar el mouse.
-
-            Args:
-                screen (pygame.Surface): Superficie donde se dibujará el botón.
-            """
-            scale = 1.2 if self.hovered else 1.0
-            new_width = int(self.base_rect.width * scale)
-            new_height = int(self.base_rect.height * scale)
-            new_x = self.base_rect.centerx - new_width // 2
-            new_y = self.base_rect.centery - new_height // 2
-            self.rect = pygame.Rect(new_x, new_y, new_width, new_height)
-            pygame.draw.rect(screen, self.color, self.rect, border_radius=15)
-            text_surf = button_font.render(self.text, True, WHITE)
-            scaled_text = pygame.transform.scale(text_surf,
-                                                (int(text_surf.get_width() * scale),
-                                                int(text_surf.get_height() * scale)))
-            text_rect = scaled_text.get_rect(center=self.rect.center)
-            screen.blit(scaled_text, text_rect)
-
-        def check_hover(self, pos):
-            """
-            Verifica si el mouse está sobre el botón.
-
-            Args:
-                pos (tuple): Posición del mouse en formato (x, y).
-            """
-            self.hovered = self.rect.collidepoint(pos)
-
-        def click(self):
-            """
-            Ejecuta la acción asociada al botón cuando se hace clic.
-
-            Returns:
-                any: El resultado de la acción asociada (por ejemplo, 'game' para el botón "Jugar").
-                None si no hay acción asociada.
-            """
-            button_sound.play()
-            if self.action:
-                return self.action()
-            return None
-
-    # Clase slider volumen
-    class Slider:
-        """
-        Clase que representa un slider para ajustar el volumen de la música de fondo.
-
-        Args:
-            x (int): Posición en el eje X del slider.
-            y (int): Posición en el eje Y del slider.
-            width (int): Ancho del slider.
-            height (int): Alto del slider.
-        """
-        def __init__(self, x, y, width, height):
-            self.rect = pygame.Rect(x, y, width, height)
-            self.handle_rect = pygame.Rect(x, y, 20, height * 2)
-            self.value = 0.2
-            self.dragging = False
-
-        def draw(self, screen):
-            """
-            Dibuja el slider en la pantalla.
-
-            Args:
-                screen (pygame.Surface): Superficie donde se dibujará el slider.
-            """
-            pygame.draw.rect(screen, GRAY, self.rect)
-            self.handle_rect.x = self.rect.x + (self.value * (self.rect.width - self.handle_rect.width))
-            pygame.draw.rect(screen, LIGHT_BLUE, self.handle_rect)
-
-        def handle_event(self, event):
-            """
-            Maneja los eventos del mouse para ajustar el volumen con el slider.
-
-            Args:
-                event (pygame.event.Event): Evento de Pygame a procesar.
-            """
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.handle_rect.collidepoint(event.pos):
-                    self.dragging = True
-            elif event.type == pygame.MOUSEBUTTONUP:
+    def _create_slider_class(self):
+        menu = self
+        class Slider:
+            def __init__(self, x, y, width, height):
+                self.rect = pygame.Rect(x, y, width, height)
+                self.handle_rect = pygame.Rect(x, y, 20, height * 2)
+                self.value = 0.2
                 self.dragging = False
-            elif event.type == pygame.MOUSEMOTION and self.dragging:
-                new_x = max(self.rect.x, min(event.pos[0] - self.handle_rect.width // 2,
-                                            self.rect.x + self.rect.width - self.handle_rect.width))
-                self.value = (new_x - self.rect.x) / (self.rect.width - self.handle_rect.width)
-                background_music.set_volume(self.value)
 
-    # Funciones de acción
-    def start_game():
-        """
-        Acción asociada al botón "Jugar".
+            def draw(self, screen):
+                pygame.draw.rect(screen, menu.GRAY, self.rect)
+                self.handle_rect.x = self.rect.x + (self.value * (self.rect.width - self.handle_rect.width))
+                pygame.draw.rect(screen, menu.LIGHT_BLUE, self.handle_rect)
 
-        Returns:
-            str: Devuelve 'game' para indicar que el juego debe iniciarse.
-        """
+            def handle_event(self, event):
+                if event.type == pygame.MOUSEBUTTONDOWN and self.handle_rect.collidepoint(event.pos):
+                    self.dragging = True
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    self.dragging = False
+                elif event.type == pygame.MOUSEMOTION and self.dragging:
+                    new_x = max(self.rect.x, min(event.pos[0] - self.handle_rect.width // 2,
+                                                 self.rect.x + self.rect.width - self.handle_rect.width))
+                    self.value = (new_x - self.rect.x) / (self.rect.width - self.handle_rect.width)
+                    menu.background_music.set_volume(self.value)
+        return Slider
+
+    def draw_shadow(self, x, y):
+        shadow_surface = pygame.Surface((self.character_width * 0.6, 10), pygame.SRCALPHA)
+        pygame.draw.ellipse(shadow_surface, (0, 0, 0), shadow_surface.get_rect())
+        self.screen.blit(shadow_surface, (x + (self.character_width * 0.2), self.ground_y + self.character_height - 10))
+
+    def start_game(self):
         return 'game'
 
-    def show_controls():
-        """
-        Acción asociada al botón "Controles". Cambia la pantalla actual a la pantalla de controles.
-        """
-        nonlocal current_screen
-        current_screen = "controls"
+    def show_controls(self):
+        self.current_screen = "controls"
 
-    def show_credits():
-        """
-        Acción asociada al botón "Créditos". Cambia la pantalla actual a la pantalla de créditos.
-        """
-        nonlocal current_screen
-        current_screen = "credits"
+    def show_credits(self):
+        self.current_screen = "credits"
 
-    def quit_game():
-        """
-        Acción asociada al botón "Salir". Cierra el juego y termina la ejecución del programa.
-        """
+    def quit_game(self):
         pygame.quit()
         sys.exit()
 
-    # Botones
-    button_width = int(SCREEN_WIDTH * 0.25)
-    button_height = int(SCREEN_HEIGHT * 0.08)
-    button_spacing = int(SCREEN_HEIGHT * 0.03)
-    button_x = (SCREEN_WIDTH - button_width) // 2
-    button_y_start = SCREEN_HEIGHT // 3
+    def run(self):
+        clock = pygame.time.Clock()
+        while True:
+            self.screen.fill(self.BLACK)
+            current_time = pygame.time.get_ticks()
 
-    buttons = [
-        Button("Jugar", button_x, button_y_start, button_width, button_height, LIGHT_BLUE, start_game),
-        Button("Controles", button_x, button_y_start + button_height + button_spacing, button_width, button_height, LIGHT_BLUE, show_controls),
-        Button("Créditos", button_x, button_y_start + 2 * (button_height + button_spacing), button_width, button_height, LIGHT_BLUE, show_credits),
-        Button("Salir", button_x, button_y_start + 3 * (button_height + button_spacing), button_width, button_height, LIGHT_BLUE, quit_game)
-    ]
+            if not self.fading and current_time - self.last_switch_time >= self.background_switch_time:
+                self.fading = True
+                self.fade_start_time = current_time
 
-    # Slider volumen
-    slider_width = int(SCREEN_WIDTH * 0.2)
-    slider = Slider(20, SCREEN_HEIGHT - 40, slider_width, 10)
+            if self.fading:
+                elapsed_time = current_time - self.fade_start_time
+                fade_progress = min(elapsed_time / self.fade_duration, 1.0)
+                self.fade_alpha = int(fade_progress * 255)
+                if fade_progress >= 1.0:
+                    self.fading = False
+                    self.last_switch_time = current_time
+                    self.is_day = not self.is_day
 
-    # Pantalla actual
-    current_screen = "menu"
-
-    # Cargar imágenes del personaje
-    img_normal = pygame.image.load("imagen.png").convert_alpha()
-    img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
-    img_derecha = pygame.image.load("imagen1_der.png").convert_alpha()
-    img_girado = pygame.image.load("imagen1_giro.png").convert_alpha()
-    character_width, character_height = img_normal.get_size()
-
-    # Posición y salto
-    character_x = -character_width
-    ground_y = int(SCREEN_HEIGHT * 0.75)
-    character_y = ground_y
-    character_speed = 2
-    jumping = True
-    jump_counter = 0
-    jump_height = 120
-    jump_max = 150
-    character_phase = "normal"
-
-    def draw_shadow(x, y):
-        """
-        Dibuja una sombra elíptica debajo del personaje.
-
-        Args:
-            x (int): Posición en el eje X del personaje.
-            y (int): Posición en el eje Y del personaje.
-        """
-        shadow_width = character_width * 0.6
-        shadow_height = 10
-        shadow_x = x + (character_width - shadow_width) // 2
-        shadow_y = ground_y + character_height - 10
-        shadow_surface = pygame.Surface((shadow_width, shadow_height), pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow_surface, (0, 0, 0), (0, 0, shadow_width, shadow_height))
-        screen.blit(shadow_surface, (shadow_x, shadow_y))
-
-    # Bucle principal del menú
-    clock = pygame.time.Clock()
-    done = False
-
-    while not done:
-        screen.fill(BLACK)
-
-        # Verificar si es momento de iniciar una transición
-        current_time = pygame.time.get_ticks()
-        if not fading and current_time - last_switch_time >= background_switch_time:
-            fading = True
-            fade_start_time = current_time
-
-        # Manejar la transición de desvanecimiento
-        if fading:
-            elapsed_time = current_time - fade_start_time
-            fade_progress = min(elapsed_time / fade_duration, 1.0)
-            fade_alpha = int(fade_progress * 255)
-
-            if fade_progress >= 1.0:
-                fading = False
-                last_switch_time = current_time
-                is_day = not is_day
-
-        # Dibujar los fondos con desvanecimiento
-        if is_day:
-            screen.blit(background_day, (0, 0))
-            if fading:
-                background_night.set_alpha(fade_alpha)
-                screen.blit(background_night, (0, 0))
-        else:
-            screen.blit(background_night, (0, 0))
-            if fading:
-                background_day.set_alpha(fade_alpha)
-                screen.blit(background_day, (0, 0))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEMOTION:
-                for button in buttons:
-                    button.check_hover(event.pos)
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for button in buttons:
-                    if button.rect.collidepoint(event.pos):
-                        result = button.click()
-                        if result == 'game':  # Si el usuario selecciona "Jugar"
-                            background_music.stop()  # Detener la música del menú
-                            print('Dar paso al juego')
-                            return 'game'  # Devolver 'game' para indicar que se debe iniciar el juego
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    current_screen = "menu" if current_screen != "menu" else "exit"
-                    if current_screen == "exit":
-                        pygame.quit()
-                        sys.exit()
-            slider.handle_event(event)
-
-        if current_screen == "menu":
-            # Movimiento horizontal
-            character_x += character_speed
-            if character_x > SCREEN_WIDTH:
-                character_x = -character_width
-                character_y = ground_y
-                jump_counter = 0
-                jumping = True
-
-            # Animación de salto
-            if jumping:
-                jump_counter += 1
-                if jump_counter <= jump_max // 3:
-                    character_y -= jump_height / (jump_max // 3)
-                    character_phase = "subiendo"
-                elif jump_counter <= 2 * (jump_max // 3):
-                    character_phase = "arriba"
-                elif jump_counter < jump_max:
-                    character_y += jump_height / (jump_max // 3)
-                    character_phase = "bajando"
-                else:
-                    jumping = False
-                    jump_counter = 0
-                    character_y = ground_y
-                    character_phase = "normal"
+            # Dibujar fondo
+            if self.is_day:
+                self.screen.blit(self.background_day, (0, 0))
+                if self.fading:
+                    self.background_night.set_alpha(self.fade_alpha)
+                    self.screen.blit(self.background_night, (0, 0))
             else:
-                if 'wait_counter' not in locals():
-                    wait_counter = 0
-                if wait_counter < 30:
-                    wait_counter += 1
-                    character_phase = "normal"
+                self.screen.blit(self.background_night, (0, 0))
+                if self.fading:
+                    self.background_day.set_alpha(self.fade_alpha)
+                    self.screen.blit(self.background_day, (0, 0))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit_game()
+                elif event.type == pygame.MOUSEMOTION:
+                    for button in self.buttons:
+                        button.check_hover(event.pos)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    for button in self.buttons:
+                        if button.rect.collidepoint(event.pos):
+                            result = button.click()
+                            if result == 'game':
+                                self.background_music.stop()
+                                return 'game'
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    self.current_screen = "menu" if self.current_screen != "menu" else "exit"
+                    if self.current_screen == "exit":
+                        self.quit_game()
+                self.slider.handle_event(event)
+
+            if self.current_screen == "menu":
+                self.character_x += self.character_speed
+                if self.character_x > self.SCREEN_WIDTH:
+                    self.character_x = -self.character_width
+                    self.character_y = self.ground_y
+                    self.jump_counter = 0
+                    self.jumping = True
+
+                if self.jumping:
+                    self.jump_counter += 1
+                    if self.jump_counter <= self.jump_max // 3:
+                        self.character_y -= self.jump_height / (self.jump_max // 3)
+                        self.character_phase = "subiendo"
+                    elif self.jump_counter <= 2 * (self.jump_max // 3):
+                        self.character_phase = "arriba"
+                    elif self.jump_counter < self.jump_max:
+                        self.character_y += self.jump_height / (self.jump_max // 3)
+                        self.character_phase = "bajando"
+                    else:
+                        self.jumping = False
+                        self.jump_counter = 0
+                        self.character_y = self.ground_y
+                        self.character_phase = "normal"
                 else:
-                    jumping = True
-                    wait_counter = 0
+                    if self.wait_counter < 30:
+                        self.wait_counter += 1
+                        self.character_phase = "normal"
+                    else:
+                        self.jumping = True
+                        self.wait_counter = 0
 
-            # Imagen según la fase del salto
-            if character_phase == "subiendo":
-                character_img = img_izquierda
-            elif character_phase == "arriba":
-                character_img = img_girado
-            elif character_phase == "bajando":
-                character_img = img_derecha
-            else:
-                character_img = img_normal
+                if self.character_phase == "subiendo":
+                    img = self.img_izquierda
+                elif self.character_phase == "arriba":
+                    img = self.img_girado
+                elif self.character_phase == "bajando":
+                    img = self.img_derecha
+                else:
+                    img = self.img_normal
 
-            # Dibujar sombra y personaje
-            draw_shadow(character_x, character_y)
-            screen.blit(character_img, (character_x, character_y))
+                self.draw_shadow(self.character_x, self.character_y)
+                self.screen.blit(img, (self.character_x, self.character_y))
+                self.screen.blit(self.title_shadow, self.title_shadow_rect)
+                self.screen.blit(self.title_text, self.title_rect)
+                for button in self.buttons:
+                    button.draw(self.screen)
+                self.slider.draw(self.screen)
+                volume_text = self.button_font.render("Volumen", True, self.WHITE)
+                self.screen.blit(volume_text, (20, self.SCREEN_HEIGHT - 70))
 
-            # Elementos del menú
-            screen.blit(title_shadow, title_shadow_rect)
-            screen.blit(title_text, title_rect)
-            for button in buttons:
-                button.draw(screen)
-            slider.draw(screen)
-            volume_text = button_font.render("Volumen", True, WHITE)
-            screen.blit(volume_text, (20, SCREEN_HEIGHT - 70))
+            elif self.current_screen == "controls":
+                text = self.button_font.render("Controles: W, A, S, D", True, self.WHITE)
+                back = self.button_font.render("Presiona ESC para volver", True, self.WHITE)
+                self.screen.blit(text, (self.SCREEN_WIDTH // 2 - text.get_width() // 2, self.SCREEN_HEIGHT // 2))
+                self.screen.blit(back, (self.SCREEN_WIDTH // 2 - back.get_width() // 2, self.SCREEN_HEIGHT // 2 + 50))
 
-        elif current_screen == "controls":
-            controls_text = button_font.render("Controles: W,A,S,D (prueba)", True, WHITE)
-            screen.blit(controls_text, (SCREEN_WIDTH // 2 - controls_text.get_width() // 2, SCREEN_HEIGHT // 2))
-            back_text = button_font.render("Presiona ESC para volver", True, WHITE)
-            screen.blit(back_text, (SCREEN_WIDTH // 2 - back_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+            elif self.current_screen == "credits":
+                text = self.button_font.render("Créditos: Equipo TBD", True, self.WHITE)
+                back = self.button_font.render("Presiona ESC para volver", True, self.WHITE)
+                self.screen.blit(text, (self.SCREEN_WIDTH // 2 - text.get_width() // 2, self.SCREEN_HEIGHT // 2))
+                self.screen.blit(back, (self.SCREEN_WIDTH // 2 - back.get_width() // 2, self.SCREEN_HEIGHT // 2 + 50))
 
-        elif current_screen == "credits":
-            credits_text = button_font.render("Créditos: Equipo TBD", True, WHITE)
-            screen.blit(credits_text, (SCREEN_WIDTH // 2 - credits_text.get_width() // 2, SCREEN_HEIGHT // 2))
-            back_text = button_font.render("Presiona ESC para volver", True, WHITE)
-            screen.blit(back_text, (SCREEN_WIDTH // 2 - back_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+            pygame.display.flip()
+            clock.tick(60)
 
-        pygame.display.flip()
-        clock.tick(60)
-
-    # En caso de que el bucle termine sin devolver nada (no debería pasar)
-    pygame.quit()
-    sys.exit()
-
-result= show_menu()
+# Para probar el menú directamente:
+if __name__ == "__main__":
+    menu = Menu()
+    result = menu.run()
+    print("Resultado:", result)
