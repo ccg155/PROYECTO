@@ -20,8 +20,8 @@ class Menu:
         self.button_font = pygame.font.Font(None, int(self.SCREEN_HEIGHT * 0.05))
 
         # Cargar fondos día/noche
-        self.background_day = pygame.transform.scale(pygame.image.load("imagen_fondo_final.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-        self.background_night = pygame.transform.scale(pygame.image.load("imagen_fondo_noche.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.background_day = pygame.transform.scale(pygame.image.load("menu/imagen_fondo_final.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        self.background_night = pygame.transform.scale(pygame.image.load("menu/imagen_fondo_noche.png").convert(), (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         self.is_day = True
         self.background_switch_time = 10000
@@ -32,8 +32,8 @@ class Menu:
         self.fade_alpha = 0
 
         # Música
-        self.background_music = pygame.mixer.Sound("musica_fondo.wav")
-        self.button_sound = pygame.mixer.Sound("musica_boton.wav")
+        self.background_music = pygame.mixer.Sound("menu/musica_fondo.wav")
+        self.button_sound = pygame.mixer.Sound("menu/musica_boton.wav")
         self.background_music.play(-1)
         self.background_music.set_volume(0.2)
 
@@ -52,10 +52,10 @@ class Menu:
         self.current_screen = "menu"
 
         # Personaje animado
-        self.img_normal = pygame.image.load("imagen.png").convert_alpha()
-        self.img_izquierda = pygame.image.load("imagen1_izq.png").convert_alpha()
-        self.img_derecha = pygame.image.load("imagen1_der.png").convert_alpha()
-        self.img_girado = pygame.image.load("imagen1_giro.png").convert_alpha()
+        self.img_normal = pygame.image.load("menu/imagen.png").convert_alpha()
+        self.img_izquierda = pygame.image.load("menu/imagen1_izq.png").convert_alpha()
+        self.img_derecha = pygame.image.load("menu/imagen1_der.png").convert_alpha()
+        self.img_girado = pygame.image.load("menu/imagen1_giro.png").convert_alpha()
         self.character_width, self.character_height = self.img_normal.get_size()
         self.character_x = -self.character_width
         self.ground_y = int(self.SCREEN_HEIGHT * 0.75)
