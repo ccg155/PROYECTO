@@ -2,7 +2,7 @@ import pygame, sys
 from settings import *
 from level import *
 from player import *
-from menu import Menu  # Importamos la clase Menu desde el archivo menu.py
+from principal_menu import *
 
 class Game:
     """
