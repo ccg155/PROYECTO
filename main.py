@@ -2,6 +2,7 @@ import pygame, sys
 from settings import *
 from level import *
 from player import *
+from menu import Menu  # Importamos la clase Menu desde el archivo menu.py
 
 class Game:
     """
@@ -27,33 +28,37 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
         pygame.display.set_caption('FlowerPower Hardcore')
         self.clock = pygame.time.Clock()
-        self.level = Level() # Se llama a la función level, por lo que se ejecuta su constructor y por tanto se dibujan los elementos de la matriz WORLD_MAP.
+        self.level = Level()  # Se llama a la función level, por lo que se ejecuta su constructor
+        self.menu = Menu()   # Inicializamos el menú
 
         # Sonido
         main_sound = pygame.mixer.Sound('audio/main.ogg')
-        main_sound.play(loops = -1)
+        main_sound.play(loops=-1)
         main_sound.set_volume(0.4)
 
     def run(self):
         """
                Ejecuta el bucle principal del juego:
+               - Muestra el menú al inicio y espera el resultado.
+               - Si el resultado es 'game', comienza el bucle del juego.
                - Captura y gestiona eventos del teclado y del sistema.
                - Llama a la función de ejecución del nivel.
                - Actualiza la pantalla a la velocidad de fotogramas definida.
         """
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.level.toggle_menu()
-            self.screen.fill(WATER_COLOR)
-            self.level.run()
-            pygame.display.update()
-            self.clock.tick(FPS)
-
+        result = self.menu.run()  # Mostramos el menú y obtenemos el resultado
+        if result == 'game':
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            self.level.toggle_menu()
+                self.screen.fill(WATER_COLOR)
+                self.level.run()
+                pygame.display.update()
+                self.clock.tick(FPS)
 
 if __name__ == '__main__':
     game = Game()
