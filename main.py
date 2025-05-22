@@ -1,7 +1,6 @@
 from level import *
 from player import *
 from menu.principal_menu import *
-from database import DataBase
 
 class Game:
     """
@@ -27,9 +26,9 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
         pygame.display.set_caption('FlowerPower Hardcore')
         self.clock = pygame.time.Clock()
-        self.level = Level(self.database)  # Se llama a la función level, por lo que se ejecuta su constructor
+        self.level = Level()  # Se llama a la función level, por lo que se ejecuta su constructor
         self.menu = Menu()   # Inicializamos el menú
-        self.database = DataBase('database.py')
+        
 
 
 
