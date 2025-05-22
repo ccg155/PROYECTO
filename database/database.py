@@ -28,7 +28,7 @@ class DataBase:
         Cierra la conexión con la base de datos.
     """
 
-    def __init__(self, db_name: str = 'db.py'):
+    def __init__(self, db_name: str = 'database.py'):
         """
         Inicializa la conexión con la base de datos y se encarga de llamar a la
         creación de tablas donde guardar los datos.
@@ -202,8 +202,7 @@ class DataBase:
 
         self.cur.execute('''
             SELECT quantity FROM player_inventory 
-            WHERE git push origin db
-save_id = ? AND item_id = ?
+            WHERE save_id = ? AND item_id = ?
         ''', (save_id, item_id))
 
         existing = self.cur.fetchone()
